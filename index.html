@@ -33,6 +33,9 @@
 	<link rel="stylesheet" href="css/my_animations.css">
 	<link rel="stylesheet" href="css/bootstrap-toggle.min.css">
 
+	<script src="js/vendor/react.production.min.js"></script>
+	<script src="js/vendor/react-dom.production.min.js"></script> 
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
 </head>
 
 <body>
@@ -40,7 +43,8 @@
 		<div class="container main-menu">
 			<div class="row align-items-center justify-content-between d-flex">
 				<div id="logo">
-					<a href="index.html"><img src="img/logo.png" alt="" title="" /></a>
+					<a href="index.html" class="text-light"><img src="img/bot-hi.png" alt="" title=""
+							style="max-width: 50px;" />CMM-B</a>
 				</div>
 				<nav id="nav-menu-container">
 					<ul class="nav-menu">
@@ -127,7 +131,7 @@
 					<a class="primary-btn" href="#playground">Get Started Now</a>
 				</div>
 				<div class="col-lg-6 home-about-left no-padding">
-					<img class="img-fluid mx-auto" src="img/bot-search.png" alt="">
+					<img class="img-fluid mx-auto" src="img/bot-search.svg" alt="">
 				</div>
 			</div>
 		</div>
@@ -241,31 +245,43 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-6 col-md-6 blog-left">
-					<!-- <div class="thumb">
-						<img class="img-fluid" src="img/b1.jpg" alt="">
-					</div> -->
-					<!-- <div class="detais">
-						<ul class="tags">
-							<li><a href="#">Travel</a></li>
-							<li><a href="#">Life Style</a></li>
-						</ul>
-						<a href="#">
-							<h4>Portable latest Fashion for young women</h4>
-						</a>
-						<p>
-							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
-							ut labore et dolore.
-						</p>
-						<p class="date">31st January, 2018</p>
-					</div> -->
+
+
+				<div class="col-lg-3 home-about-left no-padding">
+					<img class="img-fluid mx-auto" src="img/bot-ready.png" alt="">
 				</div>
 				<div class="col-lg-6 col-md-6 blog-right">
-					
+					<div class="form-group purple-border">
+						<label for="input_full_text">Manual input: [Cause(s)],[Consequence(s)]</label>
+						<textarea class="form-control" id="input_full_text" rows="5"></textarea>
+					</div>
+					<div class="form-group purple-border">
+						<label for="input_full_text">Or you can upload a file: Text (.txt), JSON and CSV are
+							supported</label>
+						<input class="form-control" type="file"></textarea>
+					</div>
+
+					<div class="form-group green-border-focus">
+						<label for="exampleFormControlTextarea5">Input for Hypothesis to demonstrate:</label>
+						<textarea class="form-control" id="exampleFormControlTextarea5" rows="2"></textarea>
+					</div>
+					<div class="form-group green-border-focus text-right">
+						<button class="btn btn-default" style="border-radius: 50px;">
+							<span class="lnr lnr-magic-wand"></span> &nbsp; Execute
+						</button>
+					</div>
+
 				</div>
+				<div class="col-lg-3 ">
+				</div>
+				<div class="col-lg-6 col-sm-6 blog-right" id="root">
+
+				</div>
+
 			</div>
 		</div>
 	</section>
+	</div>
 	<!-- End blog Area -->
 	<!-- Back to top button-->
 	<a href="#" id="back-to-top" title="Back to top">&uarr;</a>
@@ -279,31 +295,7 @@
 			<div class="row">
 				<div class="col-lg-12  col-md-12">
 					<div class="single-footer-widget newsletter">
-						<h6>Newsletter</h6>
-						<p>You can trust us. we only send promo offers, not a single spam.</p>
-						<div id="mc_embed_signup">
-							<form target="_blank" novalidate="true"
-								action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01"
-								method="get" class="form-inline">
-
-								<div class="form-group row" style="width: 100%">
-									<div class="col-lg-8 col-md-12">
-										<input name="EMAIL" placeholder="Enter Email" onfocus="this.placeholder = ''"
-											onblur="this.placeholder = 'Enter Email '" required="" type="email">
-										<div style="position: absolute; left: -5000px;">
-											<input name="b_36c4fd991d266f23781ded980_aefe40901a" tabindex="-1" value=""
-												type="text">
-										</div>
-									</div>
-
-									<div class="col-lg-4 col-md-12">
-										<button class="nw-btn primary-btn">Subscribe<span
-												class="lnr lnr-arrow-right"></span></button>
-									</div>
-								</div>
-								<div class="info"></div>
-							</form>
-						</div>
+						<h6>Made by the P&R Duo</h6>
 					</div>
 				</div>
 			</div>
@@ -348,7 +340,17 @@
 	<script src="js/mail-script.js"></script>
 	<script src="js/main.js"></script>
 	<script src="js/bootstrap-toggle.min.js"></script>
+	
 	<script src="js/my_animation.js"></script>
+	<script type="text/babel">
+
+		ReactDOM.render(
+		  <h1>Hello, world!</h1>,
+		  document.getElementById('root')
+		);
+  
+	  </script>
+	<script type="text/babel" src="js/submit_handler.js"></script>
 </body>
 
 </html>
