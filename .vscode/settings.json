@@ -1,4 +1,22 @@
 {
-    "python.formatting.provider": "black",
-    "python.pythonPath": "_env\\Scripts\\python.exe"
+    "python.formatting.provider": "autopep8",
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/env": true,
+    },
+    
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        // "**/env":true
+    },
+    "python.linting.pylintEnabled": true,
+    "python.linting.pep8Enabled": false,
+    "python.linting.enabled": true,
+    "python.pythonPath": "_backend\\env\\Scripts\\python.exe"
+
 }
