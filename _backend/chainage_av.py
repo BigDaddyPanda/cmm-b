@@ -46,12 +46,12 @@ def est_successive():
 
 def b_reg_est_sature():
     s_faits = set(faits_initiaux)
+    ret=True
     for pr, ccl in regles_initiaux:
         if set(pr).issubset(s_faits):
-            print("False: B_Regles n'est pas Sature")
-            return False
-    print("True: B_Regles est Sature")
-    return True
+            print(f"{' '.join(pr)}: B_Regles n'est pas Sature")
+            ret&=False
+    return ret
 
 
 def chainage_avant():
