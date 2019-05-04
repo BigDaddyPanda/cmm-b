@@ -17,6 +17,9 @@ premise_separator = ["et", "and", ","]
 premise_conclusion_sep = ["=>", "alors", "so", "donc"]
 
 
+# to be used with manual_rules_base
+# and the content of uploaded_file
+
 def prepare_statemen(inp=""):
     premisse, conclusion = "", ""
     for pcs in premise_conclusion_sep:

@@ -58,6 +58,9 @@ def upload_file():
             x = []
             with open(filename) as f:
                 x = f.readlines()
+                # data_prep
+                # send chainage_av
+                # return chainage_av
             return jsonify(
                 url=f"http://127.0.0.1:5000/downloader?filename={filename}", sent_data=x
             )

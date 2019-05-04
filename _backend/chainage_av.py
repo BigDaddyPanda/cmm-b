@@ -1,5 +1,9 @@
+from flask import jsonify
 from my_input import b_regles, b_faits, b_buts
+from collections import defaultdict
 
+LOG, ETAT_BASE, CONTENU, SUCCES = ["", "", "", ""]
+LOG = defaultdict(list)
 # [
 # ([premise],[conclusion])
 # ]
@@ -16,11 +20,24 @@ deduction = []
 """
 On ajoutes toutes regles contenant 
 
+
+
+RETOUR TRAITEMENT
+    LOG:
+    {
+        "event_type":"content[old print]"
+    }
+    ETAT_BASE: final state of base de regle
+    CONTENU: final state of base des fait and content
+    SUCCES: did we make it ?
+
+
 """
 
 
 def ajouter_regle(regle):
     global deduction, faits_initiaux, regles_initiaux
+    global LOG, ETAT_BASE, CONTENU, SUCCES
     s_faits = set(faits_initiaux)
     candidat = []
     for premises, conclusions in regles_initiaux:
@@ -33,24 +50,17 @@ def ajouter_regle(regle):
 
 
 def est_successive():
-    print(
-        "But",
-        but,
-        "Faits",
-        faits_initiaux,
-        ">Succes:",
-        set(but).issubset(set(faits_initiaux)),
-    )
+    global LOG, ETAT_BASE, CONTENU, SUCCES
     return set(but).issubset(set(faits_initiaux))
 
 
 def b_reg_est_sature():
     s_faits = set(faits_initiaux)
-    ret=True
+    ret = True
     for pr, ccl in regles_initiaux:
         if set(pr).issubset(s_faits):
             print(f"{' '.join(pr)}: B_Regles n'est pas Sature")
-            ret&=False
+            ret &= False
     return ret
 
 
@@ -69,7 +79,10 @@ def chainage_avant():
         print("================")
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
+# change it to function
+def make_it_shine____babe():
+    global LOG, ETAT_BASE, CONTENU, SUCCES
     regles_initiaux, faits_initiaux, but = b_regles, b_faits, b_buts
     print("Fait", faits_initiaux, "deduction", deduction, "regles", regles_initiaux)
     # ajouter_regle("b")
@@ -81,4 +94,4 @@ if __name__ == "__main__":
         + ("sans" if not est_successive() else "avec")
         + " Succès"
     )
-
+    return jsonify(LOG=LOG, ETAT_BASE=ETAT_BASE, CONTENU=CONTENU, SUCCES=SUCCES)
