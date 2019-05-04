@@ -1,2 +1,7 @@
 Flask
 Flask-PyMongo
+Faker
+pymysql
+werkzeug
+flask_cors
+flask-mysql
