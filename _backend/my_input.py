@@ -1,15 +1,15 @@
 b_regles=[
-    (["a","b"],["c"]),
-    (["b","c"],["d"]),
-    (["b","d"],["k"]),
+    (["aze","bbdd"],["222"]),
+    (["bbdd","222"],["shewantsthed"]),
+    (["bbdd","shewantsthed"],["kebab"]),
 
 ]
 
 b_faits=[
-    "a","b"
+    "aze","bbdd"
 ]
 
 b_buts=[
-    "k"
+    "kebab"
 ]
 

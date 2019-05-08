@@ -1,29 +1,9 @@
 import os
-from flask import (
-    Flask,
-    request,
-    redirect,
-    url_for,
-    send_from_directory,
-    jsonify,
-    render_template,
-)
-from werkzeug.utils import secure_filename
-from flask_cors import CORS, cross_origin
+from config import app, ALLOWED_EXTENSIONS, UPLOAD_FOLDER, mongo
+from flask import request, jsonify, send_from_directory, render_template
+from data_prep import normalizer
+from chainage_av import ChainageAvantHandler
 from uuid import uuid4
-from flask_pymongo import PyMongo
-
-app = Flask(__name__, template_folder="static")
-app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-mongo = PyMongo(app)
-
-# Change it!
-UPLOAD_FOLDER = r"D:\DSEN-2\cmm-b\_backend\uploads"
-if not os.path.isdir(UPLOAD_FOLDER):
-    os.mkdir(UPLOAD_FOLDER)
-ALLOWED_EXTENSIONS = set(["txt", "csv", "xsl"])
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-CORS(app)
 
 
 def allowed_file(filename):
@@ -39,40 +19,56 @@ def download(filename="###"):
 
 @app.route("/uploader", methods=["GET", "POST"])
 def upload_file():
-    print("ez", request.files)
     if request.method == "POST":
+        manual_conclusion_base = request.form.get("manual_conclusion_base")
+        manual_fact_base = request.form.get("manual_fact_base")
+        manual_rules_base = request.form.get("manual_rules_base")
+        mode_auto_activated = request.form.get("mode_auto_activated")
+        uploaded_file = []
+        message = "Could not do anything!"
+        status = "failure"
+
         # check if the post request has the file part
-        if "uploaded_file" not in request.files:
-            print("No file part")
-            return redirect(request.url)
-        file = request.files["uploaded_file"]
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == "":
-            print("No selected file")
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = str(uuid4()) + "." + file.filename.rsplit(".", 1)[1].lower()
-            filename = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-            file.save(filename)
-            x = []
-            with open(filename) as f:
-                x = f.readlines()
+        if not mode_auto_activated:
+            if "uploaded_file" not in request.files:
+                print("No file part")
+            file = request.files["uploaded_file"]
+
+            # if user does not select file, browser also
+            # submit a empty part without filename
+            if file.filename == "":
+                message = "No selected file"
+                status = "failure"
+                # return redirect(request.url)
+            elif file and allowed_file(file.filename):
+                filename = str(uuid4()) + "." + file.filename.rsplit(".", 1)[1].lower()
+                file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(file_path)
+                with open(filename) as f:
+                    uploaded_file = f.readlines()
+                message = "File successfully uploaded!"
+                status = "success"
+                link = f"http://127.0.0.1:5000/downloader?filename={filename}"
                 # data_prep
                 # send chainage_av
                 # return chainage_av
-            return jsonify(
-                url=f"http://127.0.0.1:5000/downloader?filename={filename}", sent_data=x
-            )
-    return """
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    """
+                # return jsonify(
+                #     url=f"http://127.0.0.1:5000/downloader?filename={filename}", sent_data=x
+                # )
+            elif allowed_file(file.filename):
+                message = "Only Text,CSV,JSON are allowed"
+                status = "failure"
+        base_regle, base_fait, but = normalizer(
+            manual_conclusion_base,
+            manual_fact_base,
+            manual_rules_base,
+            mode_auto_activated,
+            uploaded_file,
+        )
+        ch = ChainageAvantHandler()
+        out = ch.run_it_baaaaaaaaaaaaaabe(base_regle, base_fait, but)
+        return jsonify(data=out), 200
+    return jsonify({"message": message, "status": status}), 407
 
 
 @app.route("/")

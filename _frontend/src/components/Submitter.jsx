@@ -26,9 +26,9 @@ export default class Submitter extends Component {
         data.append('manual_rules_base', this.state.manual_rules_base);
         data.append('mode_auto_activated', this.state.mode_auto_activated);
         data.append('uploaded_file', this.state.uploaded_file);
-        for (var p of data) {
-            console.log(p);
-        }
+        // for (var p of data) {
+        //     console.log(p);
+        // }
         axios({
             method: 'post',
             url: 'http://127.0.0.1:5000/uploader',

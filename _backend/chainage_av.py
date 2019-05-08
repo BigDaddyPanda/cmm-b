@@ -1,97 +1,99 @@
-from flask import jsonify
-from my_input import b_regles, b_faits, b_buts
-from collections import defaultdict
-
-LOG, ETAT_BASE, CONTENU, SUCCES = ["", "", "", ""]
-LOG = defaultdict(list)
-# [
-# ([premise],[conclusion])
-# ]
-regles_initiaux = []
-# [premises...]
-faits_initiaux = []
-# [conclusions ...]
-but = []
-
-# [(premis,conclusion)]
-deduction = []
+from copy import deepcopy
 
 
-"""
-On ajoutes toutes regles contenant 
+class ChainageAvantHandler:
+    # [
+    # ([premise],[conclusion])
+    # ]
+    regles_initiaux = []
+
+    # [premises...]
+    faits_initiaux = []
+
+    # [conclusions ...]
+    but = []
+
+    # [(premis,conclusion)]
+    deduction = []
+
+    """
+    On ajoutes toutes regles contenant 
+
+    """
+
+    def ajouter_regle(self, regle):
+        s_faits = set(self.faits_initiaux)
+        candidat = []
+        for premises, conclusions in self.regles_initiaux:
+            if set(premises).issubset(s_faits) and regle in premises:
+                candidat.append((premises, conclusions))
+                self.regles_initiaux.remove((premises, conclusions))
+        for i in candidat:
+            self.faits_initiaux.extend(i[1])
+        self.deduction.extend(candidat)
+
+    def est_successive(self):
+        return set(self.but).issubset(set(self.faits_initiaux))
+
+    def b_reg_est_sature(self):
+        s_faits = set(self.faits_initiaux)
+        ret = []
+        for pr, ccl in self.regles_initiaux:
+            ret.append(set(pr).issubset(s_faits))
+        return all(ret)
+
+    def chainage_avant(self):
+        self.status = "un-successful"
+        while not self.b_reg_est_sature():
+            for fait in self.faits_initiaux:
+                self.ajouter_regle(fait)
+                if self.b_reg_est_sature() or self.est_successive():
+                    self.status = "successful"
+                    break
+
+    def run_it_baaaaaaaaaaaaaabe(self, b_regles, b_faits, b_buts):
+        self.regles_initiaux, self.faits_initiaux, self.but = (
+            deepcopy(b_regles),
+            deepcopy(b_faits),
+            deepcopy(b_buts),
+        )
+        print(
+            "Fait",
+            self.faits_initiaux,
+            "deduction",
+            self.deduction,
+            "regles",
+            self.regles_initiaux,
+        )
+        self.chainage_avant()
+        print(self.est_successive(), self.status)
+        print(
+            "Fait",
+            self.faits_initiaux,
+            "deduction",
+            self.deduction,
+            "regles",
+            self.regles_initiaux,
+        )
+
+        return self.dfs(b_regles, b_faits, b_buts)
+
+    def dfs(self, b_regles, b_faits, b_buts):
+        re = []
+        for i in self.deduction:
+            if i in b_regles:
+                re.append(("given", i))
+            elif set(i[0]).issubset(set(b_faits)):
+                re.append(("known", i))
+            elif i in b_buts:
+                re.append(("achieved", i))
+            else:
+                re.append(("somehow", i))
 
 
+if __name__ == "__main__":
+    from my_input import b_regles, b_faits, b_buts
 
-RETOUR TRAITEMENT
-    LOG:
-    {
-        "event_type":"content[old print]"
-    }
-    ETAT_BASE: final state of base de regle
-    CONTENU: final state of base des fait and content
-    SUCCES: did we make it ?
+    myhandler = ChainageAvantHandler()
+    myhandler.run_it_baaaaaaaaaaaaaabe(b_regles, b_faits, b_buts)
 
-
-"""
-
-
-def ajouter_regle(regle):
-    global deduction, faits_initiaux, regles_initiaux
-    global LOG, ETAT_BASE, CONTENU, SUCCES
-    s_faits = set(faits_initiaux)
-    candidat = []
-    for premises, conclusions in regles_initiaux:
-        if set(premises).issubset(s_faits) and regle in premises:
-            candidat.append((premises, conclusions))
-            regles_initiaux.remove((premises, conclusions))
-    for i in candidat:
-        faits_initiaux.extend(i[1])
-    deduction.extend(candidat)
-
-
-def est_successive():
-    global LOG, ETAT_BASE, CONTENU, SUCCES
-    return set(but).issubset(set(faits_initiaux))
-
-
-def b_reg_est_sature():
-    s_faits = set(faits_initiaux)
-    ret = True
-    for pr, ccl in regles_initiaux:
-        if set(pr).issubset(s_faits):
-            print(f"{' '.join(pr)}: B_Regles n'est pas Sature")
-            ret &= False
-    return ret
-
-
-def chainage_avant():
-    while (not b_reg_est_sature()) and (not est_successive()):
-        print("Base des Faits", faits_initiaux)
-        for fait in faits_initiaux:
-            # print("fait en cours d'analyse", fait)
-            # print("Base des Regles", regles_initiaux)
-            ajouter_regle(fait)
-            if b_reg_est_sature() or est_successive():
-                break
-        print("Saturation", b_reg_est_sature())
-        print("Succes", est_successive())
-        print("Continuité", (not b_reg_est_sature()) and (not est_successive()))
-        print("================")
-
-
-# if __name__ == "__main__":
-# change it to function
-def make_it_shine____babe():
-    global LOG, ETAT_BASE, CONTENU, SUCCES
-    regles_initiaux, faits_initiaux, but = b_regles, b_faits, b_buts
-    print("Fait", faits_initiaux, "deduction", deduction, "regles", regles_initiaux)
-    # ajouter_regle("b")
-    chainage_avant()
-    if b_reg_est_sature():
-        print("Base des règles Saturée!")
-    print(
-        "Résultat est achevée "
-        + ("sans" if not est_successive() else "avec")
-        + " Succès"
-    )
-    return jsonify(LOG=LOG, ETAT_BASE=ETAT_BASE, CONTENU=CONTENU, SUCCES=SUCCES)
