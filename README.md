@@ -4,9 +4,15 @@
   - Simple interactive forum
   - Includes forward chaining
 
+### Requirements
+
+  - [Node.js/React](https://nodejs.org/) v4+ to run frontend
+  - [Pip/Python 3.7](https://pypi.org/project/pip/) 3.7
+  - [MongoDB](https://docs.mongodb.com/)
+
 ### Installation
 
-Dillinger requires [Node.js](https://nodejs.org/) v4+ to run the development tools and [Pip/Python 3.7](https://pypi.org/project/pip/).
+Dillinger requires the development tools and [Pip/Python 3.7](https://pypi.org/project/pip/).
 #### For Backend
 Install the dependencies and devDependencies and start the backend server.
 
