@@ -108,7 +108,7 @@ export default class Submitter extends Component {
         const s_lang = language[selected_language];
 
         const { mode_auto_activated } = this.state;
-
+        const populated = this.state.modal_body&&this.state.modal_body["data"]&&this.state.modal_body["data"]["data"]
         return (
             <>
                 <Modal show={this.state.show} onHide={this.handleClose}>
@@ -116,7 +116,10 @@ export default class Submitter extends Component {
                         <Modal.Title>{JSON.stringify(this.state.modal_header)}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <ReactJson src={this.state.modal_body} name={"Task Completion Details"} />
+                        {
+                            populated?<><h3>Ez</h3></>:"Error"
+                        }
+                        <ReactJson collapsed={true} src={this.state.modal_body} name={"Task Completion Details"} />
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={this.handleClose}>

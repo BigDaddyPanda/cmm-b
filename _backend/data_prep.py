@@ -9,11 +9,11 @@
 # Socrate => BF
 # Mortel => CCL
 
-conclusion_separator = ["et", "and", ","]
+conclusion_separator = [" et ", " and ", ","]
 
-premise_separator = ["et", "and", ","]
+premise_separator = [" et ", " and ", ","]
 
-premise_conclusion_sep = ["=>", "alors", "so", "donc"]
+premise_conclusion_sep = [" => ", " alors ", " so ", " donc "]
 
 
 def escape_ws(words, src="x"):
@@ -24,8 +24,10 @@ def escape_ws(words, src="x"):
             print(f"{src}escape_ws('{words[i]}')")
             while words[i][0] == " ":
                 words[i] = words[i][1:]
+            while words[i].lower().startswith("si "):
+                words[i]=words[i].lower()[3:]
             while words[i][-1] == " ":
-                words[i] = words[i][: len(words[i]) - 1]
+                words[i] = words[i][: len(words[i]) - 1] 
     else:
         while words[0] == " ":
             words = words[1:]
@@ -36,12 +38,15 @@ def escape_ws(words, src="x"):
 
 def continuos_sep(iterated, sep):
     for cs in sep:
+        print("iterated",iterated,type(iterated))
         if type(iterated) == str:
             if cs in iterated:
                 iterated = iterated.split(cs)
         else:
             for i in range(len(iterated)):
-                iterated[i] = iterated[i].split(cs)
+                print("iterated > i >",i,iterated[i])
+                xx=iterated[i].split(cs)
+                iterated[i:i+len(xx)] = xx
     return iterated
 
 
@@ -58,18 +63,18 @@ def prepare_statement(inp=""):
     premisse = escape_ws(premisse, "v")
     conclusion = escape_ws(conclusion, "e")
 
-    premisse = [str(premisse)] if type(premisse) != list else premisse
-    conclusion = [str(conclusion)] if type(conclusion) != list else conclusion
+    premisse = [str(premisse).lower()] if type(premisse) != list else [i.lower() for i in premisse]
+    conclusion = [str(conclusion).lower()] if type(conclusion) != list else [i.lower() for i in conclusion]
 
     return (premisse, conclusion)
 
 
 def stringify(stlist, sep=" "):
-    return sep.join(list(map(str, stlist)))
+    return sep.join(list(map(str, stlist))).lower()
 
 
 def escape_nl(st):
-    return st.replace("\n", "")
+    return st.replace("\n", "").lower()
 
 
 def normalizer(
@@ -95,12 +100,12 @@ def normalizer(
 
     manual_rules_base.extend(uploaded_file)
 
-    print("Conclusion to Achieve")
-    print(manual_conclusion_base)
-    print("Facts to start With")
-    print(manual_fact_base)
-    print("Given Rules")
-    print(manual_rules_base)
+    # print("Conclusion to Achieve")
+    # print(manual_conclusion_base)
+    # print("Facts to start With")
+    # print(manual_fact_base)
+    # print("Given Rules")
+    # print(manual_rules_base)
     return manual_conclusion_base, manual_fact_base, manual_rules_base
     # b_regles
     # b_faits

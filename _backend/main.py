@@ -47,7 +47,7 @@ def upload_file():
                     )
                     file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                     file.save(file_path)
-                    with open(file_path) as f:
+                    with open(file_path,encoding="utf-8") as f:
                         uploaded_file = f.readlines()
                     message = "File successfully uploaded!"
                     status = "success"
@@ -71,8 +71,14 @@ def upload_file():
                 "saturation_b_f": ch.saturation_b_f,
                 "saturation_b_r": ch.saturation_b_r,
             }
-            for i in manual_rules_base:
-                mongo.db.REGLES.insert({"premisse": i[0], "conclusion": i[1]})
+            print("Saving New Regles!")
+            mongo.db.REGLES.insert_many([{"premisse": i[0], "conclusion": i[1]} for i in base_regle])
+            # for i in base_regle:
+            #     try:
+            #     except Exception as e:
+            #         print("i>>",i)
+            #         print(e)
+                    
         else:
 
             but, base_fait, base_regle = normalizer(
@@ -91,11 +97,43 @@ def upload_file():
                 {"_id": 0},
             )
             out = {
-                "deduction": best_case,
+                "deduction": [best_case] if best_case else [],
                 "status": "Success" if best_case else "Unsuccess",
                 "saturation_b_f": (best_case != None),
                 "saturation_b_r": (best_case != None),
             }
+            print("best case",(best_case),base_fait,but)
+
+            # tries = 0
+            if not best_case:
+                base_regle = list(
+                    mongo.db.REGLES.find(
+                        {
+                            "$or": [
+                                {"premisse": {"$in": base_fait}},
+                                {"conclusion": {"$in": but}},
+                            ]
+                        },
+                        {"_id": 0},
+                    )
+                )
+                base_regle = [(i["premisse"],i["conclusion"]) for i in base_regle]
+                print("not best case",base_regle)
+                ch = ChainageAvantHandler()
+                ch.run_it_baaaaaaaaaaaaaabe(base_regle, base_fait, but)
+                out = {
+                    "deduction": ch.deduction,
+                    "status": ch.status,
+                    "saturation_b_f": ch.saturation_b_f,
+                    "saturation_b_r": ch.saturation_b_r,
+                }
+            
+            print("Regles:")
+            print(base_regle)
+            print("Fait")
+            print(base_fait)
+            print("But:")
+            print(but)
 
         return jsonify(data=out), 200
     return jsonify({"message": message, "status": status}), 407
@@ -114,4 +152,17 @@ def upload_file():
 
 
 if __name__ == "__main__":
+    # mongo.db.REGLES.delete_many({})
+    db_entry = mongo.db.REGLES.find_one()
+    print(db_entry)
+    if not db_entry:
+        mongo.db.REGLES.insert_one(
+            {"premisse": ["says woof", "it is cute"], "conclusion": ["it is a Dog"]}
+        )
+        mongo.db.REGLES.insert_one(
+            {"premisse": ["says woof", "it is a Dog"], "conclusion": ["it is the goodest boy!"]}
+        )
+        mongo.db.REGLES.insert_one(
+            {"premisse": ["says miaw", "it is evil"], "conclusion": ["it is a Cat"]}
+        )
     app.run(debug=True)

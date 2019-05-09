@@ -4,18 +4,36 @@ import Submitter from "./components/Submitter";
 import { language } from "./utils/language";
 import ChatBot from "react-simple-chatbot"; 
 
-const steps = [
-  {
-    id: "0",
-    message: "Welcome to react chatbot!",
-    trigger: "1"
-  },
-  {
-    id: "1",
-    message: "Bye!",
-    end: true
-  }
-];
+const  steps=[
+      {
+        id: '0',
+        message: 'Hi! I am CMMB you need some help?',
+        trigger:'1'
+      },
+      {
+        id: '1',
+        options: [
+          { value: 1, label: 'Yes!', trigger: '2' },
+        ],
+      },
+      
+      {
+        id: '2',
+        message: `Excellent! I am CMMB.
+        I can "change your mind" by finding the logic between rules, hypothesis and the goal you serve.
+        So what do you want me to do?`,
+        trigger:"2.1"
+      },
+      {id:"2.1",
+      options: [
+        { value: 1, label: 'I want to try!', trigger: '3' },
+      ],},
+      {
+        id: '3',
+        message: 'No Problem. Scroll to the bottom of this page to find out more!',
+        end: true,
+      },
+    ]
 
 class App extends Component {
   constructor(props) {

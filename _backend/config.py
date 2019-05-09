@@ -14,7 +14,7 @@ from flask_pymongo import PyMongo
 
 
 app = Flask(__name__, template_folder="static")
-app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
+app.config["MONGO_URI"] = "mongodb://localhost:27017/cmmb-db"
 mongo = PyMongo(app)
 
 # Change it!
