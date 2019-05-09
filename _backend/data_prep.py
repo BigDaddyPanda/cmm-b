@@ -16,54 +16,51 @@ premise_separator = ["et", "and", ","]
 premise_conclusion_sep = ["=>", "alors", "so", "donc"]
 
 
-def prepare_statemen(inp=""):
+def escape_ws(words, src="x"):
+    if words in ["", " ", "\n", "\t"]:
+        return ""
+    if type(words) == list:
+        for i in range(len(words)):
+            print(f"{src}escape_ws('{words[i]}')")
+            while words[i][0] == " ":
+                words[i] = words[i][1:]
+            while words[i][-1] == " ":
+                words[i] = words[i][: len(words[i]) - 1]
+    else:
+        while words[0] == " ":
+            words = words[1:]
+        while words[-1] == " ":
+            words = words[: len(words) - 1]
+    return words
+
+
+def continuos_sep(iterated, sep):
+    for cs in sep:
+        if type(iterated) == str:
+            if cs in iterated:
+                iterated = iterated.split(cs)
+        else:
+            for i in range(len(iterated)):
+                iterated[i] = iterated[i].split(cs)
+    return iterated
+
+
+def prepare_statement(inp=""):
     premisse, conclusion = "", ""
     for pcs in premise_conclusion_sep:
         if pcs in inp:
             premisse, conclusion = inp.split(pcs)
             break
-    for cs in premise_separator:
-        if type(premisse) == str:
-            if cs in premisse:
-                premisse = premisse.split(cs)
-        else:
-            for i in range(len(premisse)):
-                premisse[i] = premisse[i].split(cs)
 
-    for cs in conclusion_separator:
-        if type(conclusion) == str:
-            if cs in conclusion:
-                conclusion = conclusion.split(cs)
-        else:
-            for i in range(len(conclusion)):
-                conclusion[i] = conclusion[i].split(cs)
+    premisse = continuos_sep(premisse, premise_separator)
+    conclusion = continuos_sep(conclusion, conclusion_separator)
 
-    if type(premisse) == list:
-        for i in range(len(premisse)):
-            while premisse[i][0] == " ":
-                premisse[i] = premisse[i][1:]
-            while premisse[i][-1] == " ":
-                premisse[i] = premisse[i][: len(premisse[i]) - 1]
-    else:
-        while premisse[0] == " ":
-            premisse = premisse[1:]
-        while premisse[-1] == " ":
-            premisse = premisse[: len(premisse) - 1]
-
-    if type(conclusion) == list:
-        for i in range(len(conclusion)):
-            while conclusion[i][0] == " ":
-                conclusion[i] = conclusion[i][1:]
-            while conclusion[i][-1] == " ":
-                conclusion[i] = conclusion[i][: len(conclusion[i]) - 1]
-    else:
-        while conclusion[0] == " ":
-            conclusion = conclusion[1:]
-        while conclusion[-1] == " ":
-            conclusion = conclusion[: len(conclusion) - 1]
+    premisse = escape_ws(premisse, "v")
+    conclusion = escape_ws(conclusion, "e")
 
     premisse = [str(premisse)] if type(premisse) != list else premisse
     conclusion = [str(conclusion)] if type(conclusion) != list else conclusion
+
     return (premisse, conclusion)
 
 
@@ -71,19 +68,48 @@ def stringify(stlist, sep=" "):
     return sep.join(list(map(str, stlist)))
 
 
+def escape_nl(st):
+    return st.replace("\n", "")
+
+
 def normalizer(
-    manual_conclusion_base,
-    manual_fact_base,
-    manual_rules_base,
-    mode_auto_activated,
-    uploaded_file,
+    manual_conclusion_base, manual_fact_base, manual_rules_base, uploaded_file
 ):
-    return "", "", ""
+    uploaded_file = list(map(escape_nl, uploaded_file))
+    uploaded_file = list(map(prepare_statement, uploaded_file))
+
+    manual_conclusion_base = manual_conclusion_base.split("\n")
+    # print(manual_conclusion_base)
+    manual_conclusion_base = list(map(escape_ws, manual_conclusion_base))
+    # print("manual_conclusion_base",manual_conclusion_base)
+
+    manual_fact_base = manual_fact_base.split("\n")
+    # manual_fact_base = list(map(escape_nl, manual_fact_base))
+    manual_fact_base = list(map(escape_ws, manual_fact_base))
+    manual_fact_base = [i for i in manual_fact_base if i != ""]
+
+    manual_rules_base = manual_rules_base.split("\n")
+    manual_rules_base = [i for i in manual_rules_base if i != ""]
+    # manual_rules_base = list(map(escape_ws, manual_rules_base))
+    manual_rules_base = list(map(prepare_statement, manual_rules_base))
+
+    manual_rules_base.extend(uploaded_file)
+
+    print("Conclusion to Achieve")
+    print(manual_conclusion_base)
+    print("Facts to start With")
+    print(manual_fact_base)
+    print("Given Rules")
+    print(manual_rules_base)
+    return manual_conclusion_base, manual_fact_base, manual_rules_base
+    # b_regles
+    # b_faits
+    # b_buts
 
 
 if __name__ == "__main__":
     print("aze, dqs alors ss")
-    p, c = prepare_statemen("aze, dqs alors ss")
+    p, c = prepare_statement("aze, dqs alors ss")
     print(type(p), type(c))
     print(p, c)
 

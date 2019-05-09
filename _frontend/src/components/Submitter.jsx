@@ -3,6 +3,10 @@ import React, { Component } from 'react'
 import Toggle from 'react-bootstrap-toggle';
 import { language } from '../utils/language';
 import axios from "axios";
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
+import ReactJson from 'react-json-view'
+
 export default class Submitter extends Component {
     constructor(props) {
         super(props)
@@ -11,13 +15,38 @@ export default class Submitter extends Component {
             manual_fact_base: "",
             manual_rules_base: "",
             mode_auto_activated: false,
-            uploaded_file: null
+            uploaded_file: null,
+            show: false,
+            modal_body: null,
+            modal_header: null
 
         }
+
+        this.handleShow = this.handleShow.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
+        this.clean_and_clear = this.clean_and_clear.bind(this);
         this.change_submitter = this.change_submitter.bind(this)
         this.update_file_object = this.update_file_object.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.let_it_shine____baby = this.let_it_shine____baby.bind(this)
+    }
+    clean_and_clear() {
+        this.setState({
+            manual_conclusion_base: "",
+            manual_fact_base: "",
+            manual_rules_base: "",
+            mode_auto_activated: false,
+            uploaded_file: null
+        });
+    }
+
+    handleClose() {
+        this.setState({ show: false });
+    }
+
+    handleShow() {
+        this.setState({ show: true });
     }
     let_it_shine____baby() {
         let data = new FormData();
@@ -26,6 +55,7 @@ export default class Submitter extends Component {
         data.append('manual_rules_base', this.state.manual_rules_base);
         data.append('mode_auto_activated', this.state.mode_auto_activated);
         data.append('uploaded_file', this.state.uploaded_file);
+        console.log(this.state.mode_auto_activated)
         // for (var p of data) {
         //     console.log(p);
         // }
@@ -37,9 +67,20 @@ export default class Submitter extends Component {
         }).then((response) => {
             //handle success
             console.log(response.data);
+            this.setState({
+                modal_header: "Task completed!",
+                modal_body: response.data,
+                show: true
+            })
         }).catch((response) => {
             //handle error
             console.log(response);
+
+            this.setState({
+                modal_header: "Task failed!",
+                modal_body: response,
+                show: true
+            })
         });
 
     }
@@ -70,6 +111,22 @@ export default class Submitter extends Component {
 
         return (
             <>
+                <Modal show={this.state.show} onHide={this.handleClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>{JSON.stringify(this.state.modal_header)}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ReactJson src={this.state.modal_body} name={"Task Completion Details"} />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={this.handleClose}>
+                            {"Close"}
+                        </Button>
+                        <Button variant="primary" onClick={this.handleClose}>
+                            {"Save Changes"}
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
                 <div className="row d-flex justify-content-center">
                     <div className="col-md-12 pb-40 header-text text-center">
                         <h1 className="pb-10">{s_lang.t_cmm}</h1>
@@ -125,7 +182,11 @@ export default class Submitter extends Component {
                                 placeholder="Each Conclusion should be in a separate line." className="form-control" id="exampleFormControlTextarea5" rows="2"></textarea>
                         </div>
                         <div className="form-group green-border-focus text-right">
-                            <button className="btn btn-default" style={{ borderRadius: "50px" }} onClick={this.let_it_shine____baby}>
+
+                            <button className="btn btn-danger" style={{ borderRadius: "50px" }} onClick={this.clean_and_clear}>
+                                <span className="lnr lnr-trash"></span>&nbsp;{s_lang.t_cancel}
+                            </button>
+                            <button className="btn btn-default" style={{ borderRadius: "50px", minWidth: "50%" }} onClick={this.let_it_shine____baby}>
                                 <span className="lnr lnr-magic-wand"></span>&nbsp;{s_lang.t_execute}
                             </button>
                         </div>

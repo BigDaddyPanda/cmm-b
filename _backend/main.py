@@ -23,7 +23,7 @@ def upload_file():
         manual_conclusion_base = request.form.get("manual_conclusion_base")
         manual_fact_base = request.form.get("manual_fact_base")
         manual_rules_base = request.form.get("manual_rules_base")
-        mode_auto_activated = request.form.get("mode_auto_activated")
+        mode_auto_activated = request.form.get("mode_auto_activated") == "true"
         uploaded_file = []
         message = "Could not do anything!"
         status = "failure"
@@ -32,55 +32,85 @@ def upload_file():
         if not mode_auto_activated:
             if "uploaded_file" not in request.files:
                 print("No file part")
-            file = request.files["uploaded_file"]
+            else:
+                file = request.files["uploaded_file"]
 
-            # if user does not select file, browser also
-            # submit a empty part without filename
-            if file.filename == "":
-                message = "No selected file"
-                status = "failure"
-                # return redirect(request.url)
-            elif file and allowed_file(file.filename):
-                filename = str(uuid4()) + "." + file.filename.rsplit(".", 1)[1].lower()
-                file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-                file.save(file_path)
-                with open(filename) as f:
-                    uploaded_file = f.readlines()
-                message = "File successfully uploaded!"
-                status = "success"
-                link = f"http://127.0.0.1:5000/downloader?filename={filename}"
-                # data_prep
-                # send chainage_av
-                # return chainage_av
-                # return jsonify(
-                #     url=f"http://127.0.0.1:5000/downloader?filename={filename}", sent_data=x
-                # )
-            elif allowed_file(file.filename):
-                message = "Only Text,CSV,JSON are allowed"
-                status = "failure"
-        base_regle, base_fait, but = normalizer(
-            manual_conclusion_base,
-            manual_fact_base,
-            manual_rules_base,
-            mode_auto_activated,
-            uploaded_file,
-        )
-        ch = ChainageAvantHandler()
-        out = ch.run_it_baaaaaaaaaaaaaabe(base_regle, base_fait, but)
+                # if user does not select file, browser also
+                # submit a empty part without filename
+                if file.filename == "":
+                    message = "No selected file"
+                    status = "failure"
+                    # return redirect(request.url)
+                elif file and allowed_file(file.filename):
+                    filename = (
+                        str(uuid4()) + "." + file.filename.rsplit(".", 1)[1].lower()
+                    )
+                    file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                    file.save(file_path)
+                    with open(file_path) as f:
+                        uploaded_file = f.readlines()
+                    message = "File successfully uploaded!"
+                    status = "success"
+                    link = f"http://127.0.0.1:5000/downloader?filename={filename}"
+                elif allowed_file(file.filename):
+                    message = "Only Text,CSV,JSON are allowed"
+                    status = "failure"
+                print(message)
+
+            but, base_fait, base_regle = normalizer(
+                manual_conclusion_base,
+                manual_fact_base,
+                manual_rules_base,
+                uploaded_file,
+            )
+            ch = ChainageAvantHandler()
+            ch.run_it_baaaaaaaaaaaaaabe(base_regle, base_fait, but)
+            out = {
+                "deduction": ch.deduction,
+                "status": ch.status,
+                "saturation_b_f": ch.saturation_b_f,
+                "saturation_b_r": ch.saturation_b_r,
+            }
+            for i in manual_rules_base:
+                mongo.db.REGLES.insert({"premisse": i[0], "conclusion": i[1]})
+        else:
+
+            but, base_fait, base_regle = normalizer(
+                manual_conclusion_base,
+                manual_fact_base,
+                manual_rules_base,
+                uploaded_file,
+            )
+            best_case = mongo.db.REGLES.find_one(
+                {
+                    "$and": [
+                        {"premisse": {"$in": base_fait}},
+                        {"conclusion": {"$in": but}},
+                    ]
+                },
+                {"_id": 0},
+            )
+            out = {
+                "deduction": best_case,
+                "status": "Success" if best_case else "Unsuccess",
+                "saturation_b_f": (best_case != None),
+                "saturation_b_r": (best_case != None),
+            }
+
         return jsonify(data=out), 200
     return jsonify({"message": message, "status": status}), 407
 
 
-@app.route("/")
-def home_page():
-    online_users = mongo.db.users.find({"online": True})
-    return render_template("index.html", online_users=online_users)
+# @app.route("/")
+# def home_page():
+#     online_users = mongo.db.users.find({"online": True})
+#     return render_template("index.html", online_users=online_users)
 
 
-@app.route("/user/<username>")
-def user_profile(username):
-    user = mongo.db.users.find_one_or_404({"_id": username})
-    return render_template("user.html", user=user)
+# @app.route("/user/<username>")
+# def user_profile(username):
+#     user = mongo.db.users.find_one_or_404({"_id": username})
+#     return render_template("user.html", user=user)
 
 
 if __name__ == "__main__":

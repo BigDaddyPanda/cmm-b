@@ -51,9 +51,10 @@ export const language = {
         t_each_line_hyp: <>{"Each Hypothesis should be in a separate line."}</>,
         t_input_conc:"Input you opt to conclude, Each in a separate line.",
         t_each_line_conc: <>{"Each Conclusion should be in a separate line."}</>,
-        t_execute: <>{"  Execute}"}</>,
+        t_execute: <>{"  Execute"}</>,
+        t_cancel: <>{" Cancel!"}</>,
         t_manual: <>{"Manual input for Rules, each rules must match the following syntax:"}<br /><span className="text-muted text-italic">{"*[Cause(s) (comma/logical-word separated)][,/conclusion expression][Consequence(s) comma/logical-word separated]"}</span></>,
-        t_or: `Or you can upload a file: Text (.txt), JSON and CSV are supported \nEach line/item must follow the syntax above!`,
+        t_or: `Or you can upload a Text file.\nEach line/item must follow the syntax above!`,
 
 
     },
@@ -108,8 +109,9 @@ export const language = {
         t_input_conc:"But(s) de la démonstration.",
         t_each_line_conc: <>{"Chaque but doit être dans une ligne séparé."}</>,
         t_execute: <>{"  Executez!"}</>,
+        t_cancel: <>{" Effacer!"}</>,
         t_manual: <>{"Entré manuelle, Chaque règle doit respecter le syntaxe suivant:"}<br /><span className="text-muted text-italic">{"*[Cause(s) (séparé par des virgules/ expression logique)][point/expression de conclusion][séparé par des virgules/ expression logique]"}</span></>,
-        t_or: `Ou vous pouvez héberger votre fichier: Les fichier Text (.txt), JSON et CSV sont supportés \nChaque ligne/items doit respecter le syntaxe ci-dessus!`,
+        t_or: `Ou vous pouvez héberger votre fichier Text (.txt).\nChaque ligne/items doit respecter le syntaxe ci-dessus!`,
 
     }
 }
